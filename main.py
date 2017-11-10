@@ -29,6 +29,7 @@ async def join(ctx,*groups):
     acceptedRoles = []
     user = ctx.message.author
     for attemptedGroup in groups:
+        attemptedGroup = attemptedGroup.lower()
         for role in bot.activeServer.roles:
             if role.name == "auto_{}".format(attemptedGroup):
                 try:
@@ -37,7 +38,10 @@ async def join(ctx,*groups):
                 except Exception as e:
                     print(e)
                     continue
-    await bot.say('You joined {}'.format(', '.join(acceptedRoles)))
+    if not acceptedRoles:
+        await bot.say('Could not find any channels with those names')
+    else:
+        await bot.say('You joined {}'.format(', '.join(acceptedRoles)))
 
 @bot.command(pass_context=True)
 async def leave(ctx,*groups):
@@ -45,6 +49,7 @@ async def leave(ctx,*groups):
     acceptedRoles = []
     user = ctx.message.author
     for attemptedGroup in groups:
+        attemptedGroup = attemptedGroup.lower()
         for role in bot.activeServer.roles:
             if role.name == "auto_{}".format(attemptedGroup):
                 try:
@@ -53,7 +58,11 @@ async def leave(ctx,*groups):
                 except Exception as e:
                     print(e)
                     continue
-    await bot.say('You left {}'.format(', '.join(acceptedRoles)))
+
+    if not acceptedRoles:
+        await bot.say('Could not find any channels with those names')
+    else:
+        await bot.say('You left {}'.format(', '.join(acceptedRoles)))
 
 @bot.command(pass_context=True)
 async def groups(ctx):
