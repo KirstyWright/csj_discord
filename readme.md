@@ -1,4 +1,4 @@
-# Kugustsumen Discord bot
+# Kugutsumen Discord bot
 Simple bot which runs on the Kugutsumen Discord server.
 
 ### Prerequisites
