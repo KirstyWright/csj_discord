@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
-import random
 import config
 
-description = '''Bot for Kugu discord, all questions should be directed to "Kirsty (Princess Vamps)"'''
+description = '''Bot for CSJ discord discord, all questions should be directed to "Kirs"'''
 bot = commands.Bot(command_prefix='!', description=description)
+
 
 @bot.event
 async def on_ready():
@@ -12,65 +12,51 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    bot.activeServer = bot.get_server(config.serverID)
+    bot.activeServer = bot.get_server(config.serverId)
+
 
 @bot.command()
 async def list():
-    """Lists the channels you can join"""
+    """Lists the roles you can have"""
     roles = ""
     for role in bot.activeServer.roles:
-        if (role.name.startswith("auto_")):
-            roles = "{}*{}\n".format(roles,role.name[5:])
-    await bot.say('You may join any of the listed groups by typing ``!join channelName``\n{}'.format(roles))
+        if (role.name in config.roles):
+            roles = "{}*{}\n".format(roles, role.name)
+    await bot.say('You may set your type by typing ``!type roleName``:\n{}'.format(roles))
+
+@bot.event
+async def on_member_join(member):
+    channel = member.server.get_channel('441994801102061581')
+    fmt = 'Welcome to the Server {0.mention}, please read the rules and enjoy your stay. You may set your type by typing `!type <typeName>`.'
+    await bot.send_message(channel, fmt.format(member))
 
 @bot.command(pass_context=True)
-async def join(ctx,*groups):
-    """Join a discord group (channel). If you want to join multiple groups, then separate the names via a space."""
-    acceptedRoles = []
+async def type(ctx, group):
+    """Assign yourself a specified type."""
+    acceptedRole = None
     user = ctx.message.author
-    for attemptedGroup in groups:
-        attemptedGroup = attemptedGroup.lower()
-        for role in bot.activeServer.roles:
-            if role.name == "auto_{}".format(attemptedGroup):
-                try:
-                    await bot.add_roles(user,role)
-                    acceptedRoles.append(role.name[5:])
-                except Exception as e:
-                    print(e)
-                    continue
-    if not acceptedRoles:
-        await bot.say('Could not find any channels with those names')
+    attemptedGroup = group.upper()
+    for role in bot.activeServer.roles:
+        if role.name == format(attemptedGroup) and attemptedGroup in config.roles:
+            try:
+                await bot.add_roles(user, role)
+                acceptedRole = role.name
+            except Exception as e:
+                print(e)
+                continue
+    if not acceptedRole:
+        await bot.say('Could not find any role with that name')
     else:
-        await bot.say('You joined {}'.format(', '.join(acceptedRoles)))
-
-@bot.command(pass_context=True)
-async def leave(ctx,*groups):
-    """Leave a discord group (channel). If you want to leave multiple groups, then separate the names via a space."""
-    acceptedRoles = []
-    user = ctx.message.author
-    for attemptedGroup in groups:
-        attemptedGroup = attemptedGroup.lower()
+        removeRoles = []
         for role in bot.activeServer.roles:
-            if role.name == "auto_{}".format(attemptedGroup):
-                try:
-                    await bot.remove_roles(user,role)
-                    acceptedRoles.append(role.name[5:])
-                except Exception as e:
-                    print(e)
-                    continue
+            if role.name != format(attemptedGroup) and role.name in config.roles:
+                removeRoles.append(role)
+        if (len(removeRoles) > 0):
+            try:
+                await bot.remove_roles(user, *removeRoles)
+            except Exception as e:
+                print(e)
+                return
+        await bot.say('You joined {}'.format(acceptedRole))
 
-    if not acceptedRoles:
-        await bot.say('Could not find any channels with those names')
-    else:
-        await bot.say('You left {}'.format(', '.join(acceptedRoles)))
-
-@bot.command(pass_context=True)
-async def groups(ctx):
-    """Lists the discord groups (channels) you are in."""
-    acceptedRoles = []
-    user = ctx.message.author
-    for role in user.roles:
-        if (role.name.startswith("auto_")):
-            acceptedRoles.append(role.name[5:])
-    await bot.reply('You are in {}'.format(', '.join(acceptedRoles)))
 bot.run(config.token)

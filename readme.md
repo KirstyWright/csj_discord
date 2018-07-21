@@ -1,5 +1,5 @@
-# Kugutsumen Discord bot
-Simple bot which runs on the Kugutsumen Discord server.
+# CSJ Discord bot
+Simple bot which runs on the CSJ Discord server.
 
 ### Prerequisites
 
