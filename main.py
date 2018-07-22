@@ -48,11 +48,13 @@ async def type(ctx, group):
         await bot.say('Could not find any role with that name')
     else:
         removeRoles = []
-        for role in bot.activeServer.roles:
-            if role.name != format(attemptedGroup) and role.name in config.roles:
+        for role in user.roles:
+            if role.name != attemptedGroup and role.name in config.roles:
                 removeRoles.append(role)
         if (len(removeRoles) > 0):
             try:
+                print('removing role');
+                print(removeRoles);
                 await bot.remove_roles(user, *removeRoles)
             except Exception as e:
                 print(e)
