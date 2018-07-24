@@ -27,7 +27,7 @@ async def list():
 @bot.event
 async def on_member_join(member):
     channel = member.server.get_channel('441994801102061581')
-    fmt = 'Welcome to the Server {0.mention}, please read the rules and enjoy your stay. You may set your type by typing `!type <typeName>`.'
+    fmt = 'Welcome to the Server {0.mention}, please read the rules and enjoy your stay. If you wish to post an introduction, please do so in #introductions prior to setting your type. You may set your type by typing `!type <typeName>`.'
     await bot.send_message(channel, fmt.format(member))
 
 @bot.command(pass_context=True)
